@@ -44,7 +44,15 @@ function App() {
     });
   }, [cards]);
 
-  const eloTwoItems = (leftWon: boolean) => {
+  const eloTwoItems = (
+    leftWon: boolean,
+    comparison: {
+      leftCard: Card;
+      rightCard: Card;
+      leftIndex: number;
+      rightIndex: number;
+    } | null
+  ) => {
     const K = 100;
 
     // Calculate elo stuff
@@ -79,10 +87,12 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col w-screen items-center">
+    <div className="flex flex-col w-screen items-center max-w-xl mt-32 mx-auto px-8 space-y-4">
       <h1 className="text-2xl text-gray-700">Elo ⚖️</h1>
       {cards.length < 2 ? (
-        <div>Add more cards</div>
+        <div className="bg-gray-50 rounded-lg border-gray-300 border px-12 py-8 shadow-md text-gray-500">
+          Add more cards
+        </div>
       ) : (
         <Comparison comparison={comparison} eloTwoItems={eloTwoItems} />
       )}
@@ -105,28 +115,36 @@ function App() {
         />
       </form>
 
-      <button
-        onClick={(e) => {
-          e.preventDefault();
-          setShowCards(!showCards);
-        }}
-      >
-        {showCards ? "Hide" : "Show"}
-      </button>
+      {cards.length > 0 && (
+        <button
+          className="bg-gray-50 text-gray-600 px-3 py-2 rounded-md hover:bg-gray-100 focus:bg-gray-200 focus:outline-none border border-gray-300"
+          onClick={(e) => {
+            e.preventDefault();
+            setShowCards(!showCards);
+          }}
+        >
+          {showCards ? `Hide` : `Show`} {cards.length}
+        </button>
+      )}
+
       {showCards && (
-        <div className="w-full flex flex-col items-center">
+        <div className="w-full flex flex-col items-center overflow-y-auto max-h-64">
           {cards
             .sort((a, b) => b.score - a.score)
             .map((card, index) => (
               <div
                 key={index}
-                className="py-2 border-b-2 border-gray-200 w-full flex justify-between items-baseline"
+                className="py-2 px-3 border-b-2 border-gray-200 w-full flex justify-between items-baseline space-x-3"
               >
-                <h2 className="text-gray-700">{index}</h2>
-                <h2 className="text-gray-700">{card.text}</h2>
-                <h2 className="text-gray-700">{card.score}</h2>
+                <div className="flex items-baseline space-x-3">
+                  <h3 className="text-sm text-gray-700">{index + 1}</h3>
+                  <h3 className="text-sm text-gray-700">
+                    {Math.trunc(card.score)}
+                  </h3>
+                </div>
+                <h3 className="text-sm text-gray-700">{card.text}</h3>
                 <button
-                  className="px-2 py-1 rounded-md bg-gray-50 text-gray-600"
+                  className="text-sm px-2 py-1 rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 focus:bg-gray-200 focus:outline-none border border-gray-300"
                   onClick={(e) => {
                     e.preventDefault();
                     let newCards = cards;
